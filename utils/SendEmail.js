@@ -1,12 +1,12 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = async (to, subject, html) => {
+export async function sendEmail(to, subject, html) {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER, // reactors.project@gmail.com
-        pass: process.env.EMAIL_PASS, // Gmail App Password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
@@ -23,4 +23,4 @@ export const sendEmail = async (to, subject, html) => {
     console.error("Email sending failed:", error.message);
     return false;
   }
-};
+}
