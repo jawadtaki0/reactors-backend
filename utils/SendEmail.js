@@ -1,30 +1,32 @@
-import nodemailer from "nodemailer";
-
-console.log("SendEmail.js has been loaded by Node");
+import axios from "axios";
 
 export async function sendEmail(to, subject, html) {
-  console.log("sendEmail() called with:", to);
+  console.log("sendEmail() called for:", to);
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          email: "reactors.project@gmail.com",
+          name: "Reactors App",
+        },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
       },
-    });
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to,
-      subject,
-      html,
-    });
-
-    console.log("Email sent to", to);
+    console.log("Brevo email sent:", response.data);
     return true;
   } catch (error) {
-    console.error("Email sending failed:", error.message);
+    console.error("Brevo Email Error:", error.response?.data || error.message);
     return false;
   }
 }
