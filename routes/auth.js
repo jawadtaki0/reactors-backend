@@ -192,7 +192,9 @@ router.post("/resend-otp", async (req, res) => {
       <p>This code is valid for 5 minutes.</p>
     `;
 
-    await sendEmail(user.email, "New verification code", html);
+    sendEmail(user.email, "New verification code", html).catch((err) => {
+      console.error("Email send failed (resend-otp):", err.message);
+    });
 
     return res.json({ message: "A new code has been sent" });
   } catch (err) {
@@ -279,7 +281,9 @@ router.post("/register", async (req, res) => {
       <p>This code expires in 5 minutes.</p>
     `;
 
-    await sendEmail(email, "Verification code", html);
+    sendEmail(email, "Verification code", html).catch((err) => {
+      console.error("Email send failed (register):", err.message);
+    });
 
     return res.json({
       success: true,
@@ -335,7 +339,9 @@ router.post("/forgot-password", async (req, res) => {
       <p>This code expires in 5 minutes.</p>
     `;
 
-    await sendEmail(email, "Password reset code", html);
+    sendEmail(email, "Password reset code", html).catch((err) => {
+      console.error("Email send failed (forgot-password):", err.message);
+    });
 
     return res.json({
       success: true,
