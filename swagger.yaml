@@ -1,0 +1,884 @@
+openapi: 3.0.0
+info:
+  title: Reactors API Documentation
+  version: 1.0.0
+  description: API documentation for the Reactors Book Tracker project
+servers:
+  - url: https://reactors-backendd.onrender.com
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+      description: JWT token stored in HttpOnly cookie
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 691ce9f36a70ea178440d121
+        name:
+          type: string
+          example: Jawad Taki
+        email:
+          type: string
+          format: email
+          example: jawadtaki0@gmail.com
+        profilePic:
+          type: string
+          format: uri
+          nullable: true
+        authProvider:
+          type: string
+          example: google
+
+    AuthUserResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User authenticated
+        user:
+          $ref: "#/components/schemas/User"
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Something went wrong
+        error:
+          type: string
+          nullable: true
+
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john@example.com
+        password:
+          type: string
+          example: StrongP@ssw0rd
+
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User registered successfully
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: john@example.com
+        password:
+          type: string
+          example: StrongP@ssw0rd
+
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Login successful
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+
+    OtpVerifyRequest:
+      type: object
+      required:
+        - userId
+        - otp
+      properties:
+        userId:
+          type: string
+          example: 691ce9f36a70ea178440d121
+        otp:
+          type: string
+          example: "233852"
+
+    OtpVerifyResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: OTP verified successfully
+        user:
+          $ref: "#/components/schemas/User"
+
+    ResendOtpRequest:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          example: 691ce9f36a70ea178440d121
+
+    Book:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 67411c5c0a8c5d3b85e0da11
+        title:
+          type: string
+          example: The Pragmatic Programmer
+        author:
+          type: string
+          example: Andrew Hunt
+        genre:
+          type: string
+          nullable: true
+          example: Programming
+        description:
+          type: string
+          nullable: true
+          example: A practical guide to software craftsmanship.
+        coverImage:
+          type: string
+          nullable: true
+          example: https://example.com/cover.jpg
+        createdBy:
+          type: string
+          example: 691ce9f36a70ea178440d121
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateBookRequest:
+      type: object
+      required:
+        - title
+        - author
+      properties:
+        title:
+          type: string
+          example: The Pragmatic Programmer
+        author:
+          type: string
+          example: Andrew Hunt
+        genre:
+          type: string
+          example: Programming
+        description:
+          type: string
+          example: A practical guide to software craftsmanship.
+        coverImage:
+          type: string
+          example: https://example.com/cover.jpg
+
+    UpdateBookRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        genre:
+          type: string
+        description:
+          type: string
+        coverImage:
+          type: string
+
+    UserBook:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: string
+          example: 691ce9f36a70ea178440d121
+        book:
+          oneOf:
+            - type: string
+            - $ref: "#/components/schemas/Book"
+        status:
+          type: string
+          enum: [wishlist, reading, finished]
+          example: reading
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 40
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+          example: 4
+        notes:
+          type: string
+          nullable: true
+          example: Really liked the examples.
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateUserBookRequest:
+      type: object
+      required:
+        - bookId
+      properties:
+        bookId:
+          type: string
+          example: 67411c5c0a8c5d3b85e0da11
+        status:
+          type: string
+          enum: [wishlist, reading, finished]
+          example: wishlist
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 0
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+          example: Want to read this next.
+
+    UpdateUserBookRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [wishlist, reading, finished]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        notes:
+          type: string
+
+    UserBookSummary:
+      type: object
+      properties:
+        wishlist:
+          type: integer
+          example: 2
+        reading:
+          type: integer
+          example: 1
+        finished:
+          type: integer
+          example: 3
+        avgRating:
+          type: number
+          format: float
+          nullable: true
+          example: 4.3
+        totalProgress:
+          type: integer
+          example: 240
+        lastUpdated:
+          type: string
+          format: date-time
+          nullable: true
+
+tags:
+  - name: Auth
+    description: Authentication & authorization
+  - name: Books
+    description: Manage books
+  - name: UserBooks
+    description: User reading list (books + status)
+
+paths:
+  /api/auth/google:
+    get:
+      tags: [Auth]
+      summary: Start Google OAuth login
+      description: Redirects the user to Google for OAuth login.
+      responses:
+        "302":
+          description: Redirect to Google OAuth consent screen
+        "500":
+          description: Google OAuth Error
+
+  /api/auth/google/callback:
+    get:
+      tags: [Auth]
+      summary: Google OAuth callback
+      description: Handles the callback from Google, creates the user (if new), and sends MFA OTP to email.
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+          description: Authorization code returned by Google
+      responses:
+        "200":
+          description: MFA required, OTP sent to email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: MFA required
+                  email:
+                    type: string
+                    example: jawadtaki0@gmail.com
+                  userId:
+                    type: string
+        "400":
+          description: Missing or invalid code
+        "500":
+          description: Google OAuth Error
+
+  /api/auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: Verify MFA OTP
+      description: Verifies the OTP sent to the user's email, resets OTP fields, and issues a JWT cookie.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OtpVerifyRequest"
+      responses:
+        "200":
+          description: OTP verified and user logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpVerifyResponse"
+        "400":
+          description: Invalid OTP, user not found, or expired OTP
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many failed attempts, user locked temporarily
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/auth/resend-otp:
+    post:
+      tags: [Auth]
+      summary: Resend MFA OTP
+      description: Generates and emails a new OTP code to the user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResendOtpRequest"
+      responses:
+        "200":
+          description: New OTP sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: A new OTP has been sent to your email.
+        "400":
+          description: Missing userId or user not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user (email/password)
+      description: Registers a new user with name, email, and password. Sets a JWT cookie on success.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        "400":
+          description: Validation errors (name, email, or password) or email already registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email and password
+      description: Logs in a user using email/password and sets a JWT in an HttpOnly cookie.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+
+  /api/auth/logout:
+    post:
+      security:
+        - cookieAuth: []
+      tags: [Auth]
+      summary: Logout the current user
+      description: Clears the JWT cookie.
+      responses:
+        "200":
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+
+  /api/auth/me:
+    get:
+      security:
+        - cookieAuth: []
+      tags: [Auth]
+      summary: Get the current logged-in user
+      description: Returns the authenticated user based on the JWT in the cookie.
+      responses:
+        "200":
+          description: User authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUserResponse"
+        "401":
+          description: No valid token / not logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/books:
+    post:
+      security:
+        - cookieAuth: []
+      tags: [Books]
+      summary: Create a new book
+      description: Creates a new book and assigns it to the authenticated user as creator.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookRequest"
+      responses:
+        "201":
+          description: Book created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: Validation error (missing/invalid title or author, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Not authenticated
+        "500":
+          description: Server error
+    get:
+      tags: [Books]
+      summary: Get all books
+      description: Returns a list of all books in the system.
+      responses:
+        "200":
+          description: List of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+        "500":
+          description: Server error
+
+  /api/books/mine:
+    get:
+      security:
+        - cookieAuth: []
+      tags: [Books]
+      summary: Get books created by the logged-in user
+      description: Returns only the books where createdBy matches the authenticated user.
+      responses:
+        "200":
+          description: Books created by the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Books created by user
+                  count:
+                    type: integer
+                    example: 3
+                  books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Book"
+        "401":
+          description: Not authenticated
+        "500":
+          description: Server error
+
+  /api/books/{id}:
+    get:
+      tags: [Books]
+      summary: Get a single book by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Book found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+    put:
+      security:
+        - cookieAuth: []
+      tags: [Books]
+      summary: Update a book (creator only)
+      description: Only the user who created the book can update it.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookRequest"
+      responses:
+        "200":
+          description: Book updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: Validation error (e.g., title too short)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Not allowed (not the creator)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Book not found
+        "401":
+          description: Not authenticated
+    delete:
+      security:
+        - cookieAuth: []
+      tags: [Books]
+      summary: Delete a book (creator only)
+      description: Only the user who created the book can delete it.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Book deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book deleted successfully
+        "403":
+          description: Not allowed (not the creator)
+        "404":
+          description: Book not found
+        "401":
+          description: Not authenticated
+        "500":
+          description: Server error
+
+  /api/userbooks:
+    post:
+      security:
+        - cookieAuth: []
+      tags: [UserBooks]
+      summary: Add a book to the user's reading list
+      description: Creates a UserBook entry for the logged-in user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBookRequest"
+      responses:
+        "201":
+          description: Entry created in reading list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserBook"
+        "400":
+          description: Validation error or book already in list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Not authenticated
+        "500":
+          description: Server error
+    get:
+      security:
+        - cookieAuth: []
+      tags: [UserBooks]
+      summary: Get the logged-in user's reading list
+      description: Returns all UserBook entries for the logged-in user, populated with book details.
+      responses:
+        "200":
+          description: Reading list for the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserBook"
+        "401":
+          description: Not authenticated
+        "500":
+          description: Server error
+
+  /api/userbooks/summary:
+    get:
+      security:
+        - cookieAuth: []
+      tags: [UserBooks]
+      summary: Get summary statistics of the user's reading list
+      description: Returns counts for wishlist/reading/finished, average rating, total progress, and lastUpdated.
+      responses:
+        "200":
+          description: Summary of the user's reading list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Reading list summary retrieved successfully
+                  summary:
+                    $ref: "#/components/schemas/UserBookSummary"
+        "401":
+          description: Not authenticated
+        "500":
+          description: Server error
+
+  /api/userbooks/{id}:
+    put:
+      security:
+        - cookieAuth: []
+      tags: [UserBooks]
+      summary: Update a reading list entry
+      description: Only the owner of the entry can update it.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBookRequest"
+      responses:
+        "200":
+          description: UserBook entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserBook"
+        "400":
+          description: Validation error or attempt to change book field
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Not allowed (not the owner)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Entry not found
+        "401":
+          description: Not authenticated
+        "500":
+          description: Server error
+    delete:
+      security:
+        - cookieAuth: []
+      tags: [UserBooks]
+      summary: Delete a reading list entry
+      description: Only the owner of the entry can delete it.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Entry deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Entry deleted
+        "403":
+          description: Not allowed (not the owner)
+        "404":
+          description: Entry not found
+        "401":
+          description: Not authenticated
+        "500":
+          description: Server error
