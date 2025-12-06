@@ -5,7 +5,7 @@ import User from "../models/user.js";
 import querystring from "querystring";
 import axios from "axios";
 import auth from "../middleware/auth.js";
-import { sendEmail } from "../utils/SendEmail.js";
+//import { sendEmail } from "../utils/SendEmail.js";
 
 const router = express.Router();
 
@@ -192,7 +192,7 @@ router.post("/resend-otp", async (req, res) => {
       <p>This code is valid for 5 minutes.</p>
     `;
 
-    await sendEmail(user.email, "New verification code", html);
+    //await sendEmail(user.email, "New verification code", html);
 
     return res.json({ message: "A new code has been sent" });
   } catch (err) {
@@ -279,7 +279,7 @@ router.post("/register", async (req, res) => {
       <p>This code expires in 5 minutes.</p>
     `;
 
-    await sendEmail(email, "Verification code", html);
+    //await sendEmail(email, "Verification code", html);
 
     return res.json({
       success: true,
@@ -335,7 +335,7 @@ router.post("/forgot-password", async (req, res) => {
       <p>This code expires in 5 minutes.</p>
     `;
 
-    await sendEmail(email, "Password reset code", html);
+    //TODO: await sendEmail(email, "Password reset code", html);
 
     return res.json({
       success: true,
