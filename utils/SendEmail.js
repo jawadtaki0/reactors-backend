@@ -1,6 +1,10 @@
 import nodemailer from "nodemailer";
 
+console.log("SendEmail.js has been loaded by Node");
+
 export async function sendEmail(to, subject, html) {
+  console.log("sendEmail() called with:", to);
+
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -19,7 +23,7 @@ export async function sendEmail(to, subject, html) {
       html,
     });
 
-    console.log("Email sent to:", to);
+    console.log("Email sent to", to);
     return true;
   } catch (error) {
     console.error("Email sending failed:", error.message);

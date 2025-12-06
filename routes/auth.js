@@ -275,11 +275,15 @@ router.post("/register", async (req, res) => {
 
     await user.save();
 
+    console.log("📌 /register route hit");
+
     const html = `
       <h2>Verify your account</h2>
       <h1>${otp}</h1>
       <p>This code expires in 5 minutes.</p>
     `;
+
+    console.log("📌 About to call sendEmail()");
 
     sendEmail(email, "Verification code", html).catch((err) => {
       console.error("Email send failed (register):", err.message);
